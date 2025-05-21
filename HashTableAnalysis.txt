@@ -1,0 +1,26 @@
+Q1:
+As the load factor 𝛼 increases in a linear probing hash table, the likelihood of collisions rises, resulting in longer probe sequences for lookups. Consequently, more slots may need to be checked, leading to increased lookup times.
+
+
+
+Q2:
+Unsuccessful lookups slow down at a greater rate than successful lookups as 𝛼 increases, because unsuccessful lookups require scanning through more slots until an empty slot is reached.
+
+
+
+Q3:
+The cost of successful deletions and successful lookups both slow down at roughly the same rate because both operations typically scan through the same number of filled slots. Similarly, unsuccessful deletions and unsuccessful lookups exhibit comparable behavior as they both may need to traverse the hash table until they find an empty slot or determine absence, leading to similar scanning patterns and costs.
+
+
+
+Q4:
+Using a linear probing hash table with a load factor of 0.01 would lead to excessive underutilization of memory, resulting in wasted space and inefficient use of resources. The overhead of managing many empty slots would also negate the benefits of speed gained from fewer collisions.
+
+
+
+Q5:
+I propose using a chained hashing table with a load factor of around 0.7. This choice strikes a balance between efficient memory usage and performance, as it allows for manageable collision handling without excessive probing, leading to faster operations overall compared to linear probing, especially at higher load factors.
+
+
+
+
