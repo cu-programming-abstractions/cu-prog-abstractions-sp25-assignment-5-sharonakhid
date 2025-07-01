@@ -1,73 +1,80 @@
 #include "LinearProbingHashTable.h"
+#include <iostream>
+
 using namespace std;
 
-LinearProbingHashTable::LinearProbingHashTable(HashFunction<string> hashFn) {
-    : hashFn(hashFn), size(0) {
+LinearProbingHashTable::LinearProbingHashTable(HashFunction<std::string> hashFn)
+    : hashFn(hashFn), size_(0) {
     int numSlots = hashFn.numSlots();
     elems = new Slot[numSlots];
-    for (int i = 0; i < numSlots; i++) {
+    for (int i = 0; i < numSlots; ++i) {
         elems[i].type = SlotType::EMPTY;
     }
+}
+
+int LinearProbingHashTable::size() const {
+    return size_;
+}
+
+bool LinearProbingHashTable::isEmpty() const {
+    return size_ == 0;
+}
+
+bool LinearProbingHashTable::insert(const std::string& elem) {
+    int index = this->hashFn(elem);
+    int originalIndex = index;
+    int numSlots = this->hashFn.numSlots();
+
+    while (elems[index].type == SlotType::FILLED) {
+        if (elems[index].value == elem) {
+            return false; // Element already exists
+        }
+        index = (index + 1) % numSlots;
+        if (index == originalIndex) return false; // Table is full
+    }
+
+    elems[index].value = elem;
+    elems[index].type = SlotType::FILLED;
+    this->size_++;
+    return true;
+}
+
+bool LinearProbingHashTable::contains(const std::string& elem) const {
+    int index = this->hashFn(elem);
+    int numSlots = this->hashFn.numSlots();
+    int originalIndex = index;
+
+    while (elems[index].type != SlotType::EMPTY) {
+        if (elems[index].type == SlotType::FILLED && elems[index].value == elem) {
+            return true;
+        }
+        index = (index + 1) % numSlots;
+        if (index == originalIndex) break; // Looped all the way around
+    }
+    return false;
+}
+
+bool LinearProbingHashTable::remove(const std::string& elem) {
+    int index = this->hashFn(elem);
+    int numSlots = this->hashFn.numSlots();
+    int originalIndex = index;
+
+    while (elems[index].type != SlotType::EMPTY) {
+        if (elems[index].type == SlotType::FILLED && elems[index].value == elem) {
+            elems[index].type = SlotType::TOMBSTONE;
+            this->size_--;
+            return true;
+        }
+        index = (index + 1) % numSlots;
+        if (index == originalIndex) break;
+    }
+    return false;
 }
 
 LinearProbingHashTable::~LinearProbingHashTable() {
     delete[] elems;
 }
 
-int LinearProbingHashTable::size() const {
-    return size;
-}
-
-bool LinearProbingHashTable::isEmpty() const {
-   return size == 0;
-}
-
-bool LinearProbingHashTable::insert(const string& elem) {
-    f (size >= hashFn.numSlots()) {
-        return false; // Table is full
-    }
-    int index = hashFn(elem);
-    for (int i = 0; i < hashFn.numSlots(); i++) {
-        int probeIndex = (index + i) % hashFn.numSlots();
-        if (elems[probeIndex].type == SlotType::EMPTY || elems[probeIndex].type == SlotType::TOMBSTONE) {
-            elems[probeIndex].value = elem;
-            elems[probeIndex].type = SlotType::FILLED;
-            size++;
-            return true;
-        } else if (elems[probeIndex].value == elem) {
-            return false; // Element already exists
-        }
-    }
-    return false; // Table is full
-}
-
-bool LinearProbingHashTable::contains(const string& elem) const {
-    int index = hashFn(elem);
-    for (int i = 0; i < hashFn.numSlots(); i++) {
-        int probeIndex = (index + i) % hashFn.numSlots();
-        if (elems[probeIndex].type == SlotType::EMPTY) {
-            return false; // Not found
-        } else if (elems[probeIndex].type == SlotType::FILLED && elems[probeIndex].value == elem) {
-            return true; // Found
-        }
-    }
-    return false; // Not found
-}
-
-bool LinearProbingHashTable::remove(const string& elem) {
-    int index = hashFn(elem);
-    for (int i = 0; i < hashFn.numSlots(); i++) {
-        int probeIndex = (index + i) % hashFn.numSlots();
-        if (elems[probeIndex].type == SlotType::EMPTY) {
-            return false; // Not found
-        } else if (elems[probeIndex].type == SlotType::FILLED && elems[probeIndex].value == elem) {
-            elems[probeIndex].type = SlotType::TOMBSTONE; // Mark as tombstone
-            size--;
-            return true; // Successfully removed
-        }
-    }
-    return false; // Not found
-}
 
 
 /* * * * * * Test Cases Below This Point * * * * * */
